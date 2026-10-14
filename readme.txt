@@ -1,12 +1,12 @@
 === Payshen for WooCommerce ===
-Contributors: payshen
+Contributors: ratomirjovanovic
 Tags: payments, payment gateway, woocommerce, checkout, orchestration
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.1
 WC requires at least: 8.5
 WC tested up to: 11.2
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -73,6 +73,9 @@ Add `define( 'PAYSHEN_API_BASE_URL', 'https://staging.payshen.com' );` to wp-con
 WooCommerce > Status > Logs, source "payshen". Errors are always logged. Turn on Debug log for more. Keys, secrets and customer details are never logged.
 
 == Changelog ==
+
+= 1.0.1 =
+* Ready for the WordPress.org plugin directory: contributor and version headers. No change in behaviour.
 
 = 1.0.0 =
 * First release.
