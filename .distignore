@@ -9,3 +9,6 @@
 /.phpunit.cache
 /phpcs.xml.dist
 /.gitattributes
+/.github
+/README.md
+/SECURITY.md
