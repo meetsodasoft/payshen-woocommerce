@@ -168,10 +168,15 @@ final class Payshen_Order_Admin {
 
 			$status = strtoupper( (string) ( $result['status'] ?? '' ) );
 			if ( 'PENDING' === $status ) {
+				if ( $status_change && $order->has_status( array( 'processing', 'completed' ) ) ) {
+					// The status the merchant chose comes back when the provider confirms.
+					$order->update_meta_data( '_payshen_capture_target', $order->get_status() );
+					$order->save();
+				}
 				self::capture_not_done(
 					$order,
 					$status_change,
-					__( 'The provider accepted the capture and has not confirmed it yet. The order moves to Processing when it does.', 'payshen-for-woocommerce' ),
+					__( 'The provider accepted the capture and has not confirmed it yet. The order moves on when it does.', 'payshen-for-woocommerce' ),
 					false
 				);
 				Payshen_Scheduler::schedule_checks( $order_id );

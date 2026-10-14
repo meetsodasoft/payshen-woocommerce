@@ -543,6 +543,16 @@ class Payshen_Gateway extends WC_Payment_Gateway {
 					);
 				}
 				if ( Payshen_Status::AWAITING_CUSTOMER === $action && $prev_mode === $mode ) {
+					// The customer left the payment page: send them back to the same page
+					// while it is still open, so one order never has two payable pages.
+					$open_url = (string) $order->get_meta( '_payshen_next_url' );
+					$open_til = (int) $order->get_meta( '_payshen_next_expires' );
+					if ( '' !== $open_url && (string) $order->get_meta( '_payshen_next_payment' ) === $prev_id && ( 0 === $open_til || $open_til > time() + 60 ) ) {
+						return array(
+							'result'   => 'success',
+							'redirect' => $open_url,
+						);
+					}
 					$attempt = $prev_attempt;
 				} elseif ( Payshen_Status::is_unpaid_end( $action ) || Payshen_Status::AWAITING_CUSTOMER === $action ) {
 					$attempt = $prev_attempt + 1;
@@ -599,6 +609,10 @@ class Payshen_Gateway extends WC_Payment_Gateway {
 
 		$is_new = $payment_id !== $prev_id;
 		Payshen_Order_Sync::remember_payment( $order, $payment_id, $mode, $attempt, $body );
+		// The payment page, so a customer who left it is sent back to the same one.
+		$order->update_meta_data( '_payshen_next_payment', $payment_id );
+		$order->update_meta_data( '_payshen_next_url', $url );
+		$order->update_meta_data( '_payshen_next_expires', isset( $payment['next_action']['expires_at'] ) ? (int) strtotime( (string) $payment['next_action']['expires_at'] ) : 0 );
 		if ( $is_new ) {
 			$order->add_order_note(
 				sprintf(

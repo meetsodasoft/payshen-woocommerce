@@ -167,6 +167,15 @@ final class Payshen_Return_Handler {
 		if ( '' !== (string) $order->get_meta( '_payshen_authorized' ) && ! Payshen_Order_Sync::is_paid( $order ) ) {
 			return esc_html__( 'Thank you. Your payment is approved and your order has been received.', 'payshen-for-woocommerce' );
 		}
+		if ( ! Payshen_Order_Sync::is_paid( $order ) && $order->has_status( 'pending' ) && $order->needs_payment() ) {
+			// Still waiting for the customer: they may have left the payment page.
+			// Paying again resumes the same Payshen payment, so it cannot be paid twice.
+			return sprintf(
+				/* translators: %s: link to pay for the order. */
+				esc_html__( 'We have not received your payment yet. If you left the payment page, %s. If you did pay, you will get an email as soon as the payment is confirmed.', 'payshen-for-woocommerce' ),
+				'<a href="' . esc_url( $order->get_checkout_payment_url() ) . '">' . esc_html__( 'you can pay now', 'payshen-for-woocommerce' ) . '</a>'
+			);
+		}
 		if ( ! Payshen_Order_Sync::is_paid( $order ) && $order->has_status( array( 'pending', 'on-hold' ) ) ) {
 			return esc_html__( 'Thank you. Your order has been received and we are waiting for your payment to be confirmed. You will get an email as soon as it is.', 'payshen-for-woocommerce' );
 		}

@@ -280,6 +280,15 @@ final class Payshen_Order_Sync {
 			$order->add_order_note( sprintf( __( 'Payshen payment %s was captured.', 'payshen-for-woocommerce' ), $payment_id ) );
 		} else {
 			$order->payment_complete( $payment_id );
+			// A capture the merchant started by completing the order returns it to that status.
+			$target = (string) $order->get_meta( '_payshen_capture_target' );
+			if ( 'completed' === $target && ! $order->has_status( 'completed' ) ) {
+				$order->update_status( 'completed', __( 'Capture confirmed by the provider: the order is completed as requested.', 'payshen-for-woocommerce' ) );
+			}
+		}
+		if ( '' !== (string) $order->get_meta( '_payshen_capture_target' ) ) {
+			$order->delete_meta_data( '_payshen_capture_target' );
+			$order->save();
 		}
 
 		Payshen_Refunds::sync_from_payment( $order, $payment );

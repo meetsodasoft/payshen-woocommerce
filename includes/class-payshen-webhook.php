@@ -117,7 +117,8 @@ final class Payshen_Webhook {
 		}
 
 		if ( str_starts_with( $type, 'payment.' ) ) {
-			$payment_id = (string) ( $data['payment_id'] ?? ( $data['id'] ?? '' ) );
+			// The wire envelope carries it in `data`; Payshen's events API lists it beside `data`.
+			$payment_id = (string) ( $data['payment_id'] ?? ( $event['payment_id'] ?? ( $data['id'] ?? '' ) ) );
 			$result     = self::handle_payment_event( $payment_id, $mode, $type );
 		} elseif ( str_starts_with( $type, 'dispute.' ) ) {
 			$result = self::handle_dispute_event( $data, $mode, $type );
@@ -129,7 +130,12 @@ final class Payshen_Webhook {
 			// Payshen sends it again later; by then the order is free or the API answers.
 			return self::answer( 503, $result );
 		}
-		set_transient( $seen_key, 1, self::SEEN_TTL );
+		// Only an event that did something is remembered. One that found no order
+		// (it can arrive before checkout has stored the payment id) stays
+		// unremembered, so a later delivery or replay of it is applied.
+		if ( 'no_order' !== $result ) {
+			set_transient( $seen_key, 1, self::SEEN_TTL );
+		}
 		return self::answer( 200, $result );
 	}
 
