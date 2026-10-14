@@ -1,0 +1,25 @@
+{
+    "name": "payshen/payshen-for-woocommerce",
+    "description": "Payshen for WooCommerce (development tooling only; the plugin has no Composer dependencies).",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": ">=8.1"
+    },
+    "require-dev": {
+        "phpcompatibility/phpcompatibility-wp": "*",
+        "phpunit/phpunit": "^10.5",
+        "wp-coding-standards/wpcs": "^3.1"
+    },
+    "scripts": {
+        "test": "phpunit",
+        "lint": "php tests/lint.php",
+        "phpcs": "phpcs"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}
