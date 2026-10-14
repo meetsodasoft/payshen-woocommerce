@@ -8,3 +8,4 @@
 /phpunit.xml.dist
 /.phpunit.cache
 /phpcs.xml.dist
+/.gitattributes
