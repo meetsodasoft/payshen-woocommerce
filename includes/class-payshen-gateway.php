@@ -547,7 +547,7 @@ class Payshen_Gateway extends WC_Payment_Gateway {
 					// while it is still open, so one order never has two payable pages.
 					$open_url = (string) $order->get_meta( '_payshen_next_url' );
 					$open_til = (int) $order->get_meta( '_payshen_next_expires' );
-					if ( '' !== $open_url && (string) $order->get_meta( '_payshen_next_payment' ) === $prev_id && ( 0 === $open_til || $open_til > time() + 60 ) ) {
+					if ( self::is_page_url( $open_url ) && (string) $order->get_meta( '_payshen_next_payment' ) === $prev_id && ( 0 === $open_til || $open_til > time() + 60 ) ) {
 						return array(
 							'result'   => 'success',
 							'redirect' => $open_url,
@@ -611,7 +611,7 @@ class Payshen_Gateway extends WC_Payment_Gateway {
 		Payshen_Order_Sync::remember_payment( $order, $payment_id, $mode, $attempt, $body );
 		// The payment page, so a customer who left it is sent back to the same one.
 		$order->update_meta_data( '_payshen_next_payment', $payment_id );
-		$order->update_meta_data( '_payshen_next_url', $url );
+		$order->update_meta_data( '_payshen_next_url', self::is_page_url( $url ) ? $url : '' );
 		$order->update_meta_data( '_payshen_next_expires', isset( $payment['next_action']['expires_at'] ) ? (int) strtotime( (string) $payment['next_action']['expires_at'] ) : 0 );
 		if ( $is_new ) {
 			$order->add_order_note(
@@ -836,5 +836,15 @@ class Payshen_Gateway extends WC_Payment_Gateway {
 				return null !== $v;
 			}
 		);
+	}
+
+	/**
+	 * Whether a URL may be sent to the customer as a payment page: http(s) only.
+	 *
+	 * @param string $url URL.
+	 * @return bool
+	 */
+	private static function is_page_url( $url ) {
+		return '' !== $url && false !== filter_var( $url, FILTER_VALIDATE_URL ) && 1 === preg_match( '#^https?://\S+$#i', $url );
 	}
 }
