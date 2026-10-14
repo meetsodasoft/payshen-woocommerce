@@ -63,9 +63,10 @@ final class Payshen_Return_Handler {
 		}
 
 		$genuine = Payshen_Keys::check_return_token( $token, $order->get_id(), $order->get_order_key(), wp_salt( 'auth' ) );
-		// A reload of the page is answered from the last look for a few seconds.
+		// A reload of the page is answered from the last look for a few seconds,
+		// genuine return or not, so repeated hits never queue API reads.
 		$throttle = 'payshen_seen_' . $order->get_id();
-		if ( ! $genuine && false !== get_transient( $throttle ) ) {
+		if ( false !== get_transient( $throttle ) ) {
 			return;
 		}
 		set_transient( $throttle, 1, 10 );

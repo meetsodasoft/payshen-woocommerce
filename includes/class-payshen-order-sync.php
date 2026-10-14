@@ -381,6 +381,13 @@ final class Payshen_Order_Sync {
 			}
 		}
 		$mode = (string) ( $info['mode'] ?? $order->get_meta( '_payshen_mode' ) );
+		// A test-mode payment never pays an order once the store takes live
+		// payments: a customer could otherwise pay an old test page with a
+		// public test card after the switch, and nothing would have moved.
+		$gateway = function_exists( 'payshen_wc_gateway' ) ? payshen_wc_gateway() : null;
+		if ( 'live' !== $mode && $gateway && 'live' === $gateway->mode() ) {
+			$out[] = __( 'it is a test-mode payment and the store now takes live payments, so no money moved.', 'payshen-for-woocommerce' );
+		}
 		if ( 'live' === $mode && ! empty( $payment['simulated'] ) ) {
 			$out[] = __( 'Payshen says a simulation answered it, so no money moved.', 'payshen-for-woocommerce' );
 		}
