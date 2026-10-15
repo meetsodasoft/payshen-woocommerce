@@ -3,7 +3,7 @@
  * Plugin Name:          Payshen for WooCommerce
  * Plugin URI:           https://www.payshen.com/developers
  * Description:          Take payments through Payshen. Customers pay on Payshen's secure page with the cards, banks and wallets your payment providers offer.
- * Version:              1.0.2
+ * Version:              1.0.3
  * Requires at least:    6.5
  * Requires PHP:         8.1
  * Requires Plugins:     woocommerce
@@ -20,7 +20,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'PAYSHEN_WC_VERSION', '1.0.2' );
+define( 'PAYSHEN_WC_VERSION', '1.0.3' );
 define( 'PAYSHEN_WC_FILE', __FILE__ );
 define( 'PAYSHEN_WC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'PAYSHEN_WC_URL', plugin_dir_url( __FILE__ ) );
