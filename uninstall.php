@@ -13,6 +13,7 @@ defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
  */
 function payshen_wc_uninstall_site() {
 	delete_option( 'woocommerce_payshen_settings' );
+	delete_option( 'payshen_wc_connection' );
 	global $wpdb;
 
 	// Order locks and remembered webhook event ids (transients).

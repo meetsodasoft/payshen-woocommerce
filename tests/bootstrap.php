@@ -17,3 +17,4 @@ require $includes . 'class-payshen-keys.php';
 require $includes . 'class-payshen-customer.php';
 require $includes . 'class-payshen-api-exception.php';
 require $includes . 'class-payshen-api-client.php';
+require $includes . 'class-payshen-connect-request.php';
