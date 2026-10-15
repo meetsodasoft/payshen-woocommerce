@@ -330,11 +330,19 @@ final class Payshen_Order_Sync {
 			return;
 		}
 
-		$note = sprintf(
-			/* translators: %s: payment id. */
-			__( 'Payshen payment %s is authorized, not captured yet. To collect it, set the order to Processing or Completed, or use the order action "Capture payment (Payshen)". Cancelling the order releases it.', 'payshen-for-woocommerce' ),
-			$payment_id
-		);
+		// With automatic capture, some providers answer "authorized" first and
+		// capture moments later; the order moves on when the capture is seen.
+		$note = 'manual' === ( $info['capture'] ?? 'automatic' )
+			? sprintf(
+				/* translators: %s: payment id. */
+				__( 'Payshen payment %s is authorized, not captured yet. To collect it, set the order to Processing or Completed, or use the order action "Capture payment (Payshen)". Cancelling the order releases it.', 'payshen-for-woocommerce' ),
+				$payment_id
+			)
+			: sprintf(
+				/* translators: %s: payment id. */
+				__( 'Payshen payment %s is authorized; the provider is capturing it. The order moves to Processing as soon as the capture is confirmed.', 'payshen-for-woocommerce' ),
+				$payment_id
+			);
 		if ( array() !== $problems ) {
 			$note .= ' ' . __( 'Check before capturing:', 'payshen-for-woocommerce' ) . ' ' . implode( ' ', $problems );
 		}
