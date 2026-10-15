@@ -17,10 +17,13 @@ Download `payshen-for-woocommerce.zip` from the [latest release](../../releases/
 
 ## Set up
 
-1. WooCommerce → Settings → Payments → Payshen: enable it, keep Test mode on, paste your test API key (`ps_test_…`).
-2. In Payshen → Developers → Webhooks, add the webhook URL shown in the plugin settings (sandbox), subscribe it to payment events, and paste its signing secret (`whsec_…`) into the plugin.
-3. Choose automatic or manual capture and the kinds of payment to offer. Place a test order.
-4. For live payments, add your live key and live webhook secret and turn Test mode off.
+1. WooCommerce → Settings → Payments → Payshen: click **Connect with Payshen**, sign in, pick the workspace and approve. The store gets its own test key and webhook; nothing to copy.
+2. Enable it, keep Test mode on, choose automatic or manual capture and the kinds of payment to offer. Place a test order.
+3. For live payments, click **Connect again**, tick live payments and approve, then turn Test mode off.
+
+Keys can also be entered by hand: a test API key (`ps_test_…`) from Payshen → Developers, and the signing secret (`whsec_…`) of a webhook endpoint for the URL shown in the plugin settings.
+
+How Connect with Payshen works: the plugin sends the admin to Payshen with a random `state` and a PKCE (S256) challenge. After approval, Payshen sends the admin back with a one-time code, which the store's server trades, with the PKCE verifier that never left the site, at `POST /api/connect/token`. The keys can only create, read, capture, release and refund payments. Disconnect calls `POST /api/connect/disconnect`, which revokes the key and removes the store's webhook endpoint.
 
 Full guide: https://www.payshen.com/developers
 

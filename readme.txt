@@ -6,7 +6,7 @@ Tested up to: 7.1
 Requires PHP: 8.1
 WC requires at least: 8.5
 WC tested up to: 11.2
-Stable tag: 1.0.3
+Stable tag: 1.1.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,6 +27,7 @@ Payshen is a technology provider: it never holds your money. Your payment provid
 
 = Features =
 
+* Connect with Payshen: sign in and approve the store. Its API keys and webhooks are set up for you, nothing to copy.
 * Secure hosted payment page: card details never touch your store, which keeps your PCI scope small.
 * Cards, bank payments, wallets, pay later and crypto. You choose which kinds to offer, and customers see only what your providers can take.
 * Works with the WooCommerce Cart and Checkout blocks and with the classic checkout.
@@ -55,7 +56,7 @@ Setup guide: [Payshen for WooCommerce](https://www.payshen.com/developers/woocom
 
 = External service =
 
-This plugin sends payment requests to the Payshen API (https://www.payshen.com) to create, read, capture, release and refund payments. It sends the order amount, currency, order number, the customer's billing name, email, phone, address and IP address (which some payment providers require), and the addresses of your order pages. Nothing is sent until a customer chooses Payshen at checkout or you act on a Payshen order. The plugin makes no other external calls and does no tracking.
+This plugin sends payment requests to the Payshen API (https://www.payshen.com) to create, read, capture, release and refund payments. It sends the order amount, currency, order number, the customer's billing name, email, phone, address and IP address (which some payment providers require), and the addresses of your order pages. When you click Connect with Payshen, your browser takes the store's address, the address to return to and the webhook URL to Payshen, and the store then fetches its keys from Payshen; Disconnect asks Payshen to revoke them. Nothing is sent until you connect, a customer chooses Payshen at checkout or you act on a Payshen order. The plugin makes no other external calls and does no tracking.
 
 * Payshen: https://www.payshen.com
 * Terms: https://www.payshen.com/terms
@@ -64,16 +65,26 @@ This plugin sends payment requests to the Payshen API (https://www.payshen.com) 
 == Installation ==
 
 1. In WordPress, go to Plugins > Add New Plugin, search for "Payshen", then install and activate Payshen for WooCommerce. WooCommerce must be active.
-2. Go to WooCommerce > Settings > Payments > Payshen.
-3. Paste your test API key (ps_test_...) from Payshen > Developers.
-4. In Payshen > Developers, add a webhook endpoint for Sandbox with the Webhook URL shown in the plugin settings, subscribe it to all payment events, and paste its signing secret (whsec_...) into "Test webhook signing secret".
-5. Place a test order. When everything works, add your live API key and a Production webhook endpoint with its signing secret, then turn off Test mode.
+2. Go to WooCommerce > Settings > Payments > Payshen and click "Connect with Payshen".
+3. Sign in to Payshen, pick your workspace and approve. You come back to the store with its test API key and webhook set.
+4. Enable Payshen and place a test order.
+5. When everything works, click "Connect again", tick live payments and approve, then turn off Test mode.
+
+You can also enter keys by hand: a test API key (ps_test_...) from Payshen > Developers, and the signing secret (whsec_...) of a webhook endpoint for the Webhook URL shown in the plugin settings.
 
 == Frequently Asked Questions ==
 
 = Do I need a Payshen account? =
 
 Yes. The plugin connects your store to Payshen, which routes payments to your providers. Payshen is priced per merchant: [ask for a quote](https://www.payshen.com/pricing).
+
+= How do I connect my store? =
+
+Click "Connect with Payshen" in the plugin settings, sign in to Payshen and approve the store. Payshen creates the store's API keys and webhooks and hands them to the store directly, so there is nothing to copy. The keys can only create, read, capture, release and refund payments.
+
+= What does Disconnect do? =
+
+It revokes the store's keys in Payshen, removes its webhooks there, and clears them from the store. Keys you entered by hand are cleared from the store but not revoked.
 
 = Does Payshen hold my money? =
 
@@ -148,15 +159,21 @@ Yes, GPL-2.0-or-later. Development happens on [GitHub](https://github.com/meetso
 1. Payshen at checkout, in the WooCommerce Checkout block.
 2. Payshen's secure payment page, showing the methods your providers offer.
 3. The order received page after a successful payment.
-4. Plugin settings: API keys, test mode, payment methods and capture.
+4. Plugin settings: Connect with Payshen, test mode, payment methods and capture.
 5. A Payshen order in the admin, with the payment notes and order actions.
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Connect with Payshen: set up the store's keys and webhooks by signing in, with nothing to copy.
 
 = 1.0.3 =
 Fuller plugin page and FAQ, and a clearer order note while a provider is still capturing a payment.
 
 == Changelog ==
+
+= 1.1.0 =
+* Connect with Payshen: sign in to Payshen and approve the store; its API keys and webhooks are set up for you. Secured with a one-time code and PKCE. Disconnect revokes the keys in Payshen.
 
 = 1.0.3 =
 * With automatic capture, a payment the provider has authorized but not yet captured no longer tells you to capture it yourself; the order note says the provider is capturing it.

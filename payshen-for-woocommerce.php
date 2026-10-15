@@ -3,7 +3,7 @@
  * Plugin Name:          Payshen for WooCommerce
  * Plugin URI:           https://www.payshen.com/developers
  * Description:          Take payments through Payshen. Customers pay on Payshen's secure page with the cards, banks and wallets your payment providers offer.
- * Version:              1.0.3
+ * Version:              1.1.0
  * Requires at least:    6.5
  * Requires PHP:         8.1
  * Requires Plugins:     woocommerce
@@ -20,7 +20,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'PAYSHEN_WC_VERSION', '1.0.3' );
+define( 'PAYSHEN_WC_VERSION', '1.1.0' );
 define( 'PAYSHEN_WC_FILE', __FILE__ );
 define( 'PAYSHEN_WC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'PAYSHEN_WC_URL', plugin_dir_url( __FILE__ ) );
@@ -33,6 +33,7 @@ require_once PAYSHEN_WC_PATH . 'includes/class-payshen-keys.php';
 require_once PAYSHEN_WC_PATH . 'includes/class-payshen-customer.php';
 require_once PAYSHEN_WC_PATH . 'includes/class-payshen-api-exception.php';
 require_once PAYSHEN_WC_PATH . 'includes/class-payshen-api-client.php';
+require_once PAYSHEN_WC_PATH . 'includes/class-payshen-connect-request.php';
 
 /**
  * Declare support for order storage (HPOS) and the Cart and Checkout blocks.
@@ -65,6 +66,7 @@ function payshen_wc_init() {
 	require_once PAYSHEN_WC_PATH . 'includes/class-payshen-webhook.php';
 	require_once PAYSHEN_WC_PATH . 'includes/class-payshen-return-handler.php';
 	require_once PAYSHEN_WC_PATH . 'includes/class-payshen-order-admin.php';
+	require_once PAYSHEN_WC_PATH . 'includes/class-payshen-connect.php';
 
 	add_filter( 'woocommerce_payment_gateways', 'payshen_wc_add_gateway' );
 	add_filter( 'plugin_action_links_' . plugin_basename( PAYSHEN_WC_FILE ), 'payshen_wc_action_links' );
@@ -74,6 +76,7 @@ function payshen_wc_init() {
 	Payshen_Return_Handler::init();
 	Payshen_Order_Admin::init();
 	Payshen_Refunds::init();
+	Payshen_Connect::init();
 
 	// Fired by WooCommerce when the Checkout block collects its payment methods.
 	add_action( 'woocommerce_blocks_payment_method_type_registration', 'payshen_wc_register_blocks' );

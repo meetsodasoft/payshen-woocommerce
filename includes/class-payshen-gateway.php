@@ -60,6 +60,9 @@ class Payshen_Gateway extends WC_Payment_Gateway {
 		$webhook_url = self::webhook_url();
 
 		$this->form_fields = array(
+			'connect'             => array(
+				'type' => 'payshen_connect',
+			),
 			'enabled'             => array(
 				'title'   => __( 'Enable', 'payshen-for-woocommerce' ),
 				'type'    => 'checkbox',
@@ -108,7 +111,7 @@ class Payshen_Gateway extends WC_Payment_Gateway {
 			'api_title'           => array(
 				'title'       => __( 'API keys', 'payshen-for-woocommerce' ),
 				'type'        => 'title',
-				'description' => __( 'Find your keys in Payshen under Developers. Test keys start with ps_test_ and use the sandbox: no money moves. Live keys start with ps_live_.', 'payshen-for-woocommerce' ),
+				'description' => __( 'Connect with Payshen, at the top of this page, fills these in for you. To enter them by hand instead, find them in Payshen under Developers. Test keys start with ps_test_ and use the sandbox: no money moves. Live keys start with ps_live_.', 'payshen-for-woocommerce' ),
 			),
 			'testmode'            => array(
 				'title'       => __( 'Test mode', 'payshen-for-woocommerce' ),
@@ -171,6 +174,30 @@ class Payshen_Gateway extends WC_Payment_Gateway {
 	 */
 	public static function webhook_url() {
 		return rest_url( 'payshen/v1/webhook' );
+	}
+
+	/**
+	 * The "Connect with Payshen" box, as a settings row.
+	 *
+	 * @param string $key  Field key.
+	 * @param array  $data Field.
+	 * @return string
+	 */
+	public function generate_payshen_connect_html( $key, $data ) {
+		ob_start();
+		Payshen_Connect::render_box();
+		return '<tr valign="top"><td colspan="2" style="padding:0">' . ob_get_clean() . '</td></tr>';
+	}
+
+	/**
+	 * The box is not a setting: nothing to save.
+	 *
+	 * @param string $key   Field key.
+	 * @param mixed  $value Posted value.
+	 * @return string
+	 */
+	public function validate_payshen_connect_field( $key, $value ) {
+		return '';
 	}
 
 	/**
@@ -297,6 +324,26 @@ class Payshen_Gateway extends WC_Payment_Gateway {
 		);
 		$saved  = parent::process_admin_options();
 		Payshen_Logger::reset();
+
+		// A key changed by hand is no longer the one Payshen handed over, so
+		// Disconnect must not revoke it.
+		$connection = Payshen_Connect::connection();
+		if ( $connection ) {
+			$modes = array_values(
+				array_filter(
+					$connection['modes'],
+					function ( $mode ) use ( $before ) {
+						return $this->api_key( $mode ) === $before[ $mode ];
+					}
+				)
+			);
+			if ( array() === $modes ) {
+				delete_option( Payshen_Connect::OPTION );
+			} elseif ( $modes !== $connection['modes'] ) {
+				$connection['modes'] = $modes;
+				update_option( Payshen_Connect::OPTION, $connection, false );
+			}
+		}
 
 		foreach ( array( 'test', 'live' ) as $mode ) {
 			$key = $this->api_key( $mode );
