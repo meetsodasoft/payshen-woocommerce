@@ -374,6 +374,11 @@ class Payshen_Gateway extends WC_Payment_Gateway {
 			if ( 401 === $e->status ) {
 				/* translators: %s: test or live. */
 				WC_Admin_Settings::add_error( sprintf( __( 'Payshen did not accept the %s API key. Check that you copied all of it.', 'payshen-for-woocommerce' ), $label ) );
+			} elseif ( 'account_not_approved' === $e->error_code ) {
+				// A live key before Payshen has reviewed and approved the workspace; test keys work meanwhile.
+				WC_Admin_Settings::add_error( __( 'The live API key is saved, but live payments start only once your Payshen workspace is approved. Send it for review on Get live in your Payshen dashboard; test mode works meanwhile.', 'payshen-for-woocommerce' ) );
+			} elseif ( 'tenant_suspended' === $e->error_code ) {
+				WC_Admin_Settings::add_error( __( 'Your Payshen workspace is suspended, so Payshen refused the key. Contact Payshen support.', 'payshen-for-woocommerce' ) );
 			} elseif ( 403 === $e->status ) {
 				/* translators: %s: test or live. */
 				WC_Admin_Settings::add_error( sprintf( __( 'The %s API key is not allowed to do everything this plugin needs. Use a full-access key, or one with payments:read, payments:write and refunds:write.', 'payshen-for-woocommerce' ), $label ) );
@@ -810,6 +815,7 @@ class Payshen_Gateway extends WC_Payment_Gateway {
 			case 'unauthorized':
 			case 'invalid_api_key':
 			case 'tenant_suspended':
+			case 'account_not_approved':
 			case 'insufficient_scope':
 				$message = __( 'This payment method is not available right now. Please choose another one.', 'payshen-for-woocommerce' );
 				break;
