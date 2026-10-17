@@ -108,7 +108,13 @@ final class Payshen_Return_Handler {
 			exit;
 		}
 
-		if ( ! Payshen_Order_Sync::is_paid( $order ) ) {
+		// The cancel link is the customer's own and works until the order is
+		// paid, so a reload loop must not turn into one API read per hit (each
+		// spends the store's Payshen rate limit). The same few seconds' memory
+		// as the return.
+		$throttle = 'payshen_seen_' . $order->get_id();
+		if ( ! Payshen_Order_Sync::is_paid( $order ) && false === get_transient( $throttle ) ) {
+			set_transient( $throttle, 1, 10 );
 			self::sync_for_customer( $order->get_id(), 1 );
 		}
 		$order = wc_get_order( $order->get_id() );

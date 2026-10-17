@@ -175,6 +175,8 @@ Fuller plugin page and FAQ, and a clearer order note while a provider is still c
 = 1.1.0 =
 * Connect with Payshen: sign in to Payshen and approve the store; its API keys and webhooks are set up for you. Secured with a one-time code and PKCE. Disconnect revokes the keys in Payshen.
 * A live key saved before your Payshen workspace is approved for live payments now says so, and what to do, instead of reporting a key without permissions. A suspended workspace is named as such.
+* Saved API keys and webhook signing secrets are no longer written into the settings page: each box shows the saved one by its prefix and last four characters, a box left empty keeps it, and "Remove the saved one" clears it.
+* The cancel link from Payshen's page asks Payshen at most once every few seconds, and an unsigned webhook request is logged as a warning at most once in ten minutes, so neither can be used to spend the store's API allowance or fill its logs.
 
 = 1.0.3 =
 * With automatic capture, a payment the provider has authorized but not yet captured no longer tells you to capture it yourself; the order note says the provider is capturing it.

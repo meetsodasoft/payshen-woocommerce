@@ -85,7 +85,15 @@ final class Payshen_Webhook {
 			}
 		}
 		if ( null === $mode ) {
-			Payshen_Logger::warning( 'Webhook signature did not verify', array( 'reason' => $verdict ) );
+			// Anyone can post to this URL, so a refusal is a warning at most once in
+			// ten minutes (enough to spot a wrong secret) and debug otherwise: junk
+			// must not be able to fill the store's logs.
+			if ( false === get_transient( 'payshen_badsig_logged' ) ) {
+				set_transient( 'payshen_badsig_logged', 1, 10 * MINUTE_IN_SECONDS );
+				Payshen_Logger::warning( 'Webhook signature did not verify (further refusals in the next 10 minutes are logged at debug level)', array( 'reason' => $verdict ) );
+			} else {
+				Payshen_Logger::debug( 'Webhook signature did not verify', array( 'reason' => $verdict ) );
+			}
 			$status = in_array( $verdict, array( Payshen_Signature::MISSING_SIGNATURE, Payshen_Signature::MALFORMED_SIGNATURE ), true ) ? 400 : 401;
 			return self::answer( $status, $verdict );
 		}

@@ -201,6 +201,56 @@ class Payshen_Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
+	 * The four credential fields. A saved key or secret is never written back
+	 * into the page: the box stays empty, its placeholder names the saved one by
+	 * its prefix and last four characters, and a box left empty keeps it.
+	 *
+	 * @var string[]
+	 */
+	const SECRET_FIELDS = array( 'test_api_key', 'test_webhook_secret', 'live_api_key', 'live_webhook_secret' );
+
+	/**
+	 * A credential field, rendered without its saved value.
+	 *
+	 * @param string $key  Field key.
+	 * @param array  $data Field definition.
+	 * @return string
+	 */
+	public function generate_password_html( $key, $data ) {
+		if ( ! in_array( $key, self::SECRET_FIELDS, true ) ) {
+			return parent::generate_password_html( $key, $data );
+		}
+		$saved = (string) $this->get_option( $key );
+		if ( '' === $saved ) {
+			return parent::generate_password_html( $key, $data );
+		}
+		$data['placeholder'] = sprintf(
+			/* translators: %s: the saved key, shortened, e.g. ps_live_...a1b2. */
+			__( '%s is saved. Type a new one to replace it.', 'payshen-for-woocommerce' ),
+			self::shortened( $saved )
+		);
+		// WooCommerce writes get_option() into value=""; for this one render it reads nothing.
+		$this->settings[ $key ] = '';
+		$html                   = parent::generate_password_html( $key, $data );
+		$this->settings[ $key ] = $saved;
+		$clear                  = '<label style="display:block;margin-top:6px;"><input type="checkbox" name="' . esc_attr( $this->get_field_key( $key ) . '_clear' ) . '" value="1" /> '
+			. esc_html__( 'Remove the saved one', 'payshen-for-woocommerce' ) . '</label>';
+		$at                     = strrpos( $html, '</fieldset>' );
+		return false === $at ? $html . $clear : substr( $html, 0, $at ) . $clear . substr( $html, $at );
+	}
+
+	/**
+	 * A key or secret by its prefix and last four characters, enough to tell two apart.
+	 *
+	 * @param string $value Key or secret.
+	 * @return string
+	 */
+	private static function shortened( $value ) {
+		$prefix = preg_match( '/^(ps_(?:test|live)_|whsec_)/', $value, $m ) ? $m[1] : '';
+		return $prefix . '...' . substr( $value, -4 );
+	}
+
+	/**
 	 * Settings page: a warning when the active mode is not fully set up.
 	 */
 	public function admin_options() {
@@ -295,7 +345,11 @@ class Payshen_Gateway extends WC_Payment_Gateway {
 	private function validate_credential( $key, $value, $mode, $kind ) {
 		$value = trim( stripslashes( (string) $value ) );
 		if ( '' === $value ) {
-			return '';
+			// The box is rendered empty (generate_password_html), so empty keeps the
+			// saved value; only the Remove box clears it. WooCommerce checked the
+			// settings nonce before any validate_ method runs.
+			$clear = isset( $_POST[ $this->get_field_key( $key ) . '_clear' ] ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Verified by WooCommerce's settings save.
+			return $clear ? '' : (string) $this->get_option( $key );
 		}
 		$ok = 'api_key' === $kind ? Payshen_Keys::is_api_key( $value, $mode ) : Payshen_Keys::is_webhook_secret( $value );
 		if ( $ok ) {
