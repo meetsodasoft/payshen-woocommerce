@@ -266,6 +266,13 @@ class Payshen_Gateway extends WC_Payment_Gateway {
 			/* translators: %s: API URL. */
 			$problems[] = sprintf( __( 'Using the Payshen API at %s (set in wp-config.php or by a filter).', 'payshen-for-woocommerce' ), self::base_url() );
 		}
+		if ( Payshen_Php_Version::needs_update( PHP_VERSION ) ) {
+			$problems[] = sprintf(
+				/* translators: %s: the server's PHP version. */
+				__( 'This server runs PHP %s, which may be missing PHP\'s critical security fix of 21 October 2026 (CVE-2026-109618, CVE-2026-109619). Ask your host to update to PHP 8.2.35, 8.3.36, 8.4.27, 8.5.12 or newer. If your host has already applied the fix to this version, you can ignore this.', 'payshen-for-woocommerce' ),
+				PHP_VERSION
+			);
+		}
 		foreach ( $problems as $problem ) {
 			echo '<div class="notice notice-warning inline"><p>' . esc_html( $problem ) . '</p></div>';
 		}

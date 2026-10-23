@@ -9,7 +9,7 @@ Take payments through [Payshen](https://www.payshen.com) in a WooCommerce store.
 - Cart and Checkout blocks and the classic checkout; High-Performance Order Storage.
 - Test mode against the Payshen sandbox.
 
-Requires WordPress 6.5+, WooCommerce 8.5+ and PHP 8.1+. Tested with WordPress 7.1 and WooCommerce 11.2.
+Requires WordPress 6.5+, WooCommerce 8.5+ and PHP 8.2+ (with PHP's October 2026 security release: 8.2.35, 8.3.36, 8.4.27, 8.5.12 or newer). Tested with WordPress 7.1 and WooCommerce 11.2.
 
 ## Install
 
