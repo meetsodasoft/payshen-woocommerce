@@ -5,7 +5,7 @@
  * Description:          Take payments through Payshen. Customers pay on Payshen's secure page with the cards, banks and wallets your payment providers offer.
  * Version:              1.1.0
  * Requires at least:    6.5
- * Requires PHP:         8.1
+ * Requires PHP:         8.2
  * Requires Plugins:     woocommerce
  * Author:               Payshen
  * Author URI:           https://www.payshen.com
@@ -34,6 +34,7 @@ require_once PAYSHEN_WC_PATH . 'includes/class-payshen-customer.php';
 require_once PAYSHEN_WC_PATH . 'includes/class-payshen-api-exception.php';
 require_once PAYSHEN_WC_PATH . 'includes/class-payshen-api-client.php';
 require_once PAYSHEN_WC_PATH . 'includes/class-payshen-connect-request.php';
+require_once PAYSHEN_WC_PATH . 'includes/class-payshen-php-version.php';
 
 /**
  * Declare support for order storage (HPOS) and the Cart and Checkout blocks.

@@ -3,7 +3,7 @@ Contributors: ratomirjovanovic
 Tags: payment gateway, payments, credit card, woocommerce, payment orchestration
 Requires at least: 6.5
 Tested up to: 7.1
-Requires PHP: 8.1
+Requires PHP: 8.2
 WC requires at least: 8.5
 WC tested up to: 11.2
 Stable tag: 1.1.0
@@ -165,6 +165,7 @@ Yes, GPL-2.0-or-later. Development happens on [GitHub](https://github.com/meetso
 == Upgrade Notice ==
 
 = 1.1.0 =
+* Security: requires PHP 8.2 or newer. The settings page warns when the server's PHP may be missing PHP's critical security release of 21 October 2026 (CVE-2026-109618, CVE-2026-109619), so you can ask your host to update. The plugin itself is not affected by these flaws.
 Connect with Payshen: set up the store's keys and webhooks by signing in, with nothing to copy.
 
 = 1.0.3 =
