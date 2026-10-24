@@ -739,7 +739,7 @@ class Payshen_Gateway extends WC_Payment_Gateway {
 		Payshen_Scheduler::schedule_checks( $order->get_id(), $order );
 		$order->save();
 
-		if ( '' === $url || false === filter_var( $url, FILTER_VALIDATE_URL ) || preg_match( '#^https?://\S+$#i', $url ) !== 1 ) {
+		if ( ! self::is_page_url( $url ) ) {
 			// No page to send the customer to: read what Payshen holds and act on it.
 			Payshen_Order_Sync::apply( $order, $payment, 'checkout' );
 			Payshen_Logger::warning(
@@ -953,12 +953,13 @@ class Payshen_Gateway extends WC_Payment_Gateway {
 	}
 
 	/**
-	 * Whether a URL may be sent to the customer as a payment page: http(s) only.
+	 * Whether a URL may be sent to the customer as a payment page: https only,
+	 * except http to localhost for local development.
 	 *
 	 * @param string $url URL.
 	 * @return bool
 	 */
 	private static function is_page_url( $url ) {
-		return '' !== $url && false !== filter_var( $url, FILTER_VALIDATE_URL ) && 1 === preg_match( '#^https?://\S+$#i', $url );
+		return Payshen_API_Client::is_payment_page_url( $url );
 	}
 }

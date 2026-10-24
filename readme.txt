@@ -166,7 +166,7 @@ Yes, GPL-2.0-or-later. Development happens on [GitHub](https://github.com/meetso
 
 = 1.1.0 =
 * Security: requires PHP 8.2 or newer. The settings page warns when the server's PHP may be missing PHP's critical security release of 21 October 2026 (CVE-2026-109618, CVE-2026-109619), so you can ask your host to update. The plugin itself is not affected by these flaws.
-Connect with Payshen: set up the store's keys and webhooks by signing in, with nothing to copy.
+Connect with Payshen: set up the store's keys and webhooks by signing in, with nothing to copy. The customer is sent only to an https payment page, and a malformed payment id is refused before any call to Payshen.
 
 = 1.0.3 =
 Fuller plugin page and FAQ, and a clearer order note while a provider is still capturing a payment.
@@ -174,6 +174,8 @@ Fuller plugin page and FAQ, and a clearer order note while a provider is still c
 == Changelog ==
 
 = 1.1.0 =
+* Security: the customer is sent to a payment page only over https (plain http is allowed for localhost and 127.0.0.1, for local development). Before, an http address would have been used too.
+* Security: a payment id is checked before it is put into an API address (1 to 128 letters, digits, "_" or "-"). An id such as "." or ".." could otherwise have reached a different Payshen endpoint; it is now refused with `invalid_payment_id` and nothing is sent.
 * Connect with Payshen: sign in to Payshen and approve the store; its API keys and webhooks are set up for you. Secured with a one-time code and PKCE. Disconnect revokes the keys in Payshen.
 * A live key saved before your Payshen workspace is approved for live payments now says so, and what to do, instead of reporting a key without permissions. A suspended workspace is named as such.
 * Saved API keys and webhook signing secrets are no longer written into the settings page: each box shows the saved one by its prefix and last four characters, a box left empty keeps it, and "Remove the saved one" clears it.
