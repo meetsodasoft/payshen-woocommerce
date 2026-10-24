@@ -117,6 +117,41 @@ class Payshen_API_Client {
 	}
 
 	/**
+	 * Whether a URL may be sent to the customer as a payment page: https, or
+	 * http to this machine for local development. Plain http elsewhere would
+	 * let anyone on the customer's network rewrite the page they pay on.
+	 *
+	 * @param string $url URL.
+	 * @return bool
+	 */
+	public static function is_payment_page_url( $url ) {
+		if ( ! is_string( $url ) || '' === $url || false === filter_var( $url, FILTER_VALIDATE_URL ) || preg_match( '#^\S+$#', $url ) !== 1 ) {
+			return false;
+		}
+		if ( preg_match( '#^https://[^/\s]+#i', $url ) === 1 ) {
+			return true;
+		}
+		return preg_match( '#^http://(localhost|127\.0\.0\.1)(:\d+)?(/|\?|\#|$)#i', $url ) === 1;
+	}
+
+	/**
+	 * A payment id checked before it becomes part of the path. Encoding alone
+	 * is not enough: `.` and `..` pass rawurlencode unchanged, so a read of
+	 * `.` would hit the list and a refund of `..` another route.
+	 *
+	 * @param mixed $payment_id Payment id.
+	 * @return string
+	 * @throws Payshen_API_Exception With `invalid_payment_id`, before anything is sent.
+	 */
+	private static function path_id( $payment_id ) {
+		if ( ! is_string( $payment_id ) || preg_match( '/^[A-Za-z0-9_-]{1,128}$/D', $payment_id ) !== 1 ) {
+			// 400, not 0: a refusal, never an unknown outcome to retry or wait for.
+			throw new Payshen_API_Exception( 400, 'invalid_payment_id', 'The payment id must be 1-128 letters, digits, "_" or "-".' );
+		}
+		return $payment_id;
+	}
+
+	/**
 	 * Create a payment. The hosted flow answers REQUIRES_ACTION with next_action.url.
 	 *
 	 * @param array  $body            Request body.
@@ -132,9 +167,10 @@ class Payshen_API_Client {
 	 *
 	 * @param string $payment_id Payment id.
 	 * @return array
+	 * @throws Payshen_API_Exception On an error answer, or `invalid_payment_id` before sending.
 	 */
 	public function get_payment( $payment_id ) {
-		return $this->data( $this->request( 'GET', '/api/v1/payments/' . rawurlencode( (string) $payment_id ) ) );
+		return $this->data( $this->request( 'GET', '/api/v1/payments/' . self::path_id( $payment_id ) ) );
 	}
 
 	/**
@@ -147,7 +183,7 @@ class Payshen_API_Client {
 	 */
 	public function capture( $payment_id, $amount, $idempotency_key ) {
 		$body = null === $amount ? array() : array( 'amount' => (int) $amount );
-		return $this->data( $this->request( 'POST', '/api/v1/payments/' . rawurlencode( (string) $payment_id ) . '/capture', $body, $idempotency_key ) );
+		return $this->data( $this->request( 'POST', '/api/v1/payments/' . self::path_id( $payment_id ) . '/capture', $body, $idempotency_key ) );
 	}
 
 	/**
@@ -158,7 +194,7 @@ class Payshen_API_Client {
 	 * @return array
 	 */
 	public function void( $payment_id, $idempotency_key ) {
-		return $this->data( $this->request( 'POST', '/api/v1/payments/' . rawurlencode( (string) $payment_id ) . '/void', array(), $idempotency_key ) );
+		return $this->data( $this->request( 'POST', '/api/v1/payments/' . self::path_id( $payment_id ) . '/void', array(), $idempotency_key ) );
 	}
 
 	/**
@@ -172,7 +208,7 @@ class Payshen_API_Client {
 	 */
 	public function refund( $payment_id, $amount, $idempotency_key ) {
 		$body = null === $amount ? array() : array( 'amount' => (int) $amount );
-		return $this->data( $this->request( 'POST', '/api/v1/payments/' . rawurlencode( (string) $payment_id ) . '/refunds', $body, $idempotency_key ) );
+		return $this->data( $this->request( 'POST', '/api/v1/payments/' . self::path_id( $payment_id ) . '/refunds', $body, $idempotency_key ) );
 	}
 
 	/**

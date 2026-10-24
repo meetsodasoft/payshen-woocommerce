@@ -57,11 +57,11 @@ final class ApiClientTest extends TestCase {
 		$this->assertSame( '{"amount":1999,"currency":"EUR","country":"DE"}', $req['body'] );
 	}
 
-	public function test_get_has_no_key_and_encodes_the_id(): void {
-		$client = $this->client( array( self::json( 200, array( 'data' => array( 'id' => 'a/b' ) ) ) ), array( 'base_url' => 'https://staging.payshen.com/' ) );
-		$client->get_payment( 'a/b' );
+	public function test_get_has_no_key_and_puts_the_id_in_the_path(): void {
+		$client = $this->client( array( self::json( 200, array( 'data' => array( 'id' => 'pay_01J-xY9' ) ) ) ), array( 'base_url' => 'https://staging.payshen.com/' ) );
+		$client->get_payment( 'pay_01J-xY9' );
 		$this->assertSame( 'GET', $this->sent[0]['method'] );
-		$this->assertSame( 'https://staging.payshen.com/api/v1/payments/a%2Fb', $this->sent[0]['url'] );
+		$this->assertSame( 'https://staging.payshen.com/api/v1/payments/pay_01J-xY9', $this->sent[0]['url'] );
 		$this->assertArrayNotHasKey( 'Idempotency-Key', $this->sent[0]['headers'] );
 		$this->assertNull( $this->sent[0]['body'] );
 	}
@@ -166,6 +166,45 @@ final class ApiClientTest extends TestCase {
 		$this->assertFalse( Payshen_API_Client::is_allowed_base_url( 'http://localhost.evil.com' ) );
 		$this->expectException( InvalidArgumentException::class );
 		new Payshen_API_Client( 'ps_test_abc', array( 'base_url' => 'http://payshen.com' ) );
+	}
+
+	public function test_an_id_that_is_not_an_id_is_refused_before_sending(): void {
+		$client = $this->client( array() );
+		$calls  = array(
+			'get_payment' => fn ( $id ) => $client->get_payment( $id ),
+			'capture'     => fn ( $id ) => $client->capture( $id, null, 'k-capture-1' ),
+			'void'        => fn ( $id ) => $client->void( $id, 'k-void-0001' ),
+			'refund'      => fn ( $id ) => $client->refund( $id, 100, 'k-refund-12' ),
+		);
+		// "." would read the list, ".." another route; the rest are not ids.
+		foreach ( $calls as $name => $call ) {
+			foreach ( array( '', '.', '..', 'a/b', 'p1/../x', "p1\n", 'p 1', str_repeat( 'a', 129 ), null, 12 ) as $bad ) {
+				try {
+					$call( $bad );
+					$this->fail( $name . ' accepted ' . json_encode( $bad ) );
+				} catch ( Payshen_API_Exception $e ) {
+					$this->assertSame( 'invalid_payment_id', $e->error_code );
+					$this->assertSame( 400, $e->status );
+					$this->assertFalse( $e->is_network_error() );
+				}
+			}
+		}
+		$this->assertSame( array(), $this->sent, 'nothing is sent' );
+	}
+
+	public function test_a_128_character_id_is_accepted(): void {
+		$client = $this->client( array( self::json( 200, array( 'data' => array() ) ) ) );
+		$client->void( str_repeat( 'p', 128 ), 'k-void-0001' );
+		$this->assertSame( 'https://www.payshen.com/api/v1/payments/' . str_repeat( 'p', 128 ) . '/void', $this->sent[0]['url'] );
+	}
+
+	public function test_a_payment_page_must_be_https_except_on_localhost(): void {
+		foreach ( array( 'https://pay.payshen.com/p/abc', 'https://pay.example/x?y=1', 'http://localhost/pay', 'http://localhost:3000/p/abc', 'http://127.0.0.1:8080/p', 'HTTP://LOCALHOST' ) as $ok ) {
+			$this->assertTrue( Payshen_API_Client::is_payment_page_url( $ok ), $ok );
+		}
+		foreach ( array( '', 'http://pay.payshen.com/p/abc', 'http://localhost.evil.com/p', 'http://localhost@evil.com/', 'http://127.0.0.1.evil.com/', 'http://127.0.0.1:80@evil.com/', 'javascript:alert(1)', 'ftp://pay.example/x', '//pay.example/x', 'https://pay.example/a b', null ) as $bad ) {
+			$this->assertFalse( Payshen_API_Client::is_payment_page_url( $bad ), (string) $bad );
+		}
 	}
 
 	public function test_key_is_required(): void {

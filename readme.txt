@@ -6,7 +6,7 @@ Tested up to: 7.1
 Requires PHP: 8.2
 WC requires at least: 8.5
 WC tested up to: 11.2
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -164,6 +164,9 @@ Yes, GPL-2.0-or-later. Development happens on [GitHub](https://github.com/meetso
 
 == Upgrade Notice ==
 
+= 1.1.1 =
+Security: the customer is sent only to an https payment page, and a malformed payment id is refused before any call to Payshen.
+
 = 1.1.0 =
 * Security: requires PHP 8.2 or newer. The settings page warns when the server's PHP may be missing PHP's critical security release of 21 October 2026 (CVE-2026-109618, CVE-2026-109619), so you can ask your host to update. The plugin itself is not affected by these flaws.
 Connect with Payshen: set up the store's keys and webhooks by signing in, with nothing to copy.
@@ -172,6 +175,10 @@ Connect with Payshen: set up the store's keys and webhooks by signing in, with n
 Fuller plugin page and FAQ, and a clearer order note while a provider is still capturing a payment.
 
 == Changelog ==
+
+= 1.1.1 =
+* Security: the customer is sent to a payment page only over https (plain http is allowed for localhost and 127.0.0.1, for local development). Before, an http address would have been used too.
+* Security: a payment id is checked before it is put into an API address (1 to 128 letters, digits, "_" or "-"). An id such as "." or ".." could otherwise have reached a different Payshen endpoint; it is now refused with `invalid_payment_id` and nothing is sent.
 
 = 1.1.0 =
 * Connect with Payshen: sign in to Payshen and approve the store; its API keys and webhooks are set up for you. Secured with a one-time code and PKCE. Disconnect revokes the keys in Payshen.
