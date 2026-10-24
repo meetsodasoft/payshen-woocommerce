@@ -165,8 +165,7 @@ Yes, GPL-2.0-or-later. Development happens on [GitHub](https://github.com/meetso
 == Upgrade Notice ==
 
 = 1.1.0 =
-* Security: requires PHP 8.2 or newer. The settings page warns when the server's PHP may be missing PHP's critical security release of 21 October 2026 (CVE-2026-109618, CVE-2026-109619), so you can ask your host to update. The plugin itself is not affected by these flaws.
-Connect with Payshen: set up the store's keys and webhooks by signing in, with nothing to copy. The customer is sent only to an https payment page, and a malformed payment id is refused before any call to Payshen.
+Security update: requires PHP 8.2+ and warns if your PHP lacks the 21 October 2026 security release. Payments go only to https pages. Adds Connect with Payshen: set up keys and webhooks by signing in.
 
 = 1.0.3 =
 Fuller plugin page and FAQ, and a clearer order note while a provider is still capturing a payment.
