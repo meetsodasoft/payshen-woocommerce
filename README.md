@@ -1,6 +1,6 @@
 # Payshen for WooCommerce
 
-Take payments through [Payshen](https://www.payshen.com) in a WooCommerce store. Customers pay on Payshen's secure page with the cards, banks and wallets your payment providers offer, and Payshen routes each payment to the provider most likely to approve it. Payshen is a technology provider: it never holds your money; your providers collect and pay you out.
+Take payments through [Payshen](https://www.payshen.com) in a WooCommerce store. Payshen routes each payment to the provider most likely to approve it, and the customer pays on that provider's secure page with the cards, banks and wallets it offers. Customers never see or choose Payshen. Payshen is a technology provider: it never holds your money; your providers collect and pay you out.
 
 - Hosted payment page: card details never touch your store.
 - Orders update by themselves: signed webhooks, plus a scheduled check for 48 hours so a lost message never leaves an order wrong.

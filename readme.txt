@@ -28,7 +28,7 @@ Payshen is a technology provider: it never holds your money. Your payment provid
 = Features =
 
 * Connect with Payshen: sign in and approve the store. Its API keys and webhooks are set up for you, nothing to copy.
-* Secure hosted payment page: card details never touch your store, which keeps your PCI scope small.
+* Card details are entered on your payment provider's secure page and never touch your store, which keeps your PCI scope small.
 * Cards, bank payments, wallets, pay later and crypto. You choose which kinds to offer, and customers see only what your providers can take.
 * Works with the WooCommerce Cart and Checkout blocks and with the classic checkout.
 * Compatible with High-Performance Order Storage (HPOS).
@@ -41,9 +41,9 @@ Payshen is a technology provider: it never holds your money. Your payment provid
 
 = How it works =
 
-1. The customer chooses Payshen at checkout.
-2. They pay on Payshen's secure page, which offers the methods your providers support for their country and currency.
-3. Payshen routes the payment to the best provider and sends the customer back to your store.
+1. The customer picks the payment option your store shows, titled "Pay online" unless you rename it. When it is the only payment method, WooCommerce selects it for them.
+2. Payshen works behind your checkout: it routes the payment to the best of your providers, and the customer pays on that provider's secure page. Payshen is not named and the customer has nothing extra to choose.
+3. The customer comes back to your order received page.
 4. The order moves to Processing (or On hold, with manual capture) as soon as the payment is confirmed.
 
 = Requirements =
@@ -56,7 +56,7 @@ Setup guide: [Payshen for WooCommerce](https://www.payshen.com/developers/woocom
 
 = External service =
 
-This plugin sends payment requests to the Payshen API (https://www.payshen.com) to create, read, capture, release and refund payments. It sends the order amount, currency, order number, the customer's billing name, email, phone, address and IP address (which some payment providers require), and the addresses of your order pages. When you click Connect with Payshen, your browser takes the store's address, the address to return to and the webhook URL to Payshen, and the store then fetches its keys from Payshen; Disconnect asks Payshen to revoke them. Nothing is sent until you connect, a customer chooses Payshen at checkout or you act on a Payshen order. The plugin makes no other external calls and does no tracking.
+This plugin sends payment requests to the Payshen API (https://www.payshen.com) to create, read, capture, release and refund payments. It sends the order amount, currency, order number, the customer's billing name, email, phone, address and IP address (which some payment providers require), and the addresses of your order pages. When you click Connect with Payshen, your browser takes the store's address, the address to return to and the webhook URL to Payshen, and the store then fetches its keys from Payshen; Disconnect asks Payshen to revoke them. Nothing is sent until you connect, a customer pays with this payment option or you act on a Payshen order. The plugin makes no other external calls and does no tracking.
 
 * Payshen: https://www.payshen.com
 * Terms: https://www.payshen.com/terms
@@ -104,11 +104,11 @@ For each payment, Payshen estimates how likely each of your providers is to appr
 
 = Which payment methods can customers use? =
 
-The ones your connected providers can take, among those you allow in the settings: card, bank, wallet and crypto. The customer picks one on Payshen's page.
+The ones your connected providers can take, among those you allow in the settings: card, bank, wallet and crypto. The customer picks one on the provider's payment page.
 
 = Is it PCI compliant? =
 
-Customers enter card details on Payshen's hosted payment page or on the provider's, never in your store, so card data does not pass through your site.
+Customers enter card details on the payment provider's page, never in your store, so card data does not pass through your site.
 
 = Does it work with the block checkout? =
 
@@ -157,7 +157,7 @@ Yes, GPL-2.0-or-later. Development happens on [GitHub](https://github.com/meetso
 == Screenshots ==
 
 1. Payshen at checkout, in the WooCommerce Checkout block.
-2. Payshen's secure payment page, showing the methods your providers offer.
+2. The payment provider's secure page, where the customer pays.
 3. The order received page after a successful payment.
 4. Plugin settings: Connect with Payshen, test mode, payment methods and capture.
 5. A Payshen order in the admin, with the payment notes and order actions.
