@@ -24,7 +24,7 @@ class Payshen_Gateway extends WC_Payment_Gateway {
 		$this->id                 = self::ID;
 		$this->has_fields         = false;
 		$this->method_title       = __( 'Payshen', 'payshen-for-woocommerce' );
-		$this->method_description = __( 'Customers pay on Payshen\'s secure page, through the payment providers you connected in Payshen. Payshen is a technology provider: your providers collect and pay out the money.', 'payshen-for-woocommerce' );
+		$this->method_description = __( 'Customers pay on the secure page of the payment provider Payshen routes each payment to, among those you connected in Payshen. Payshen is a technology provider: your providers collect and pay out the money.', 'payshen-for-woocommerce' );
 		$this->supports           = array( 'products', 'refunds' );
 
 		$this->init_form_fields();
